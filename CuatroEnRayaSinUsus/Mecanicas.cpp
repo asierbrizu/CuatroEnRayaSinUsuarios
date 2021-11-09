@@ -7,11 +7,8 @@
  */
 
 #include "Mecanicas.h"
-#include "Jugador.h"
-#include "BD.h"
 #include <stdbool.h>
 #include <stdio.h>
-
 #include "IA.h"
 
 int filaLibre(Ficha **tablero, int columna) {
@@ -170,34 +167,6 @@ int numeroDeVictorias(Ficha **tablero, int objetivo) {
 	return n;
 }
 
-char inicioSesion() {
-	cout << "1. Registrarse" << endl;
-	cout << "2. Iniciar sesión" << endl;
-	cout << "9. Salir" << endl;
-	cout << "\n" << endl;
-	cout << "Opción: " << endl;
-
-	char linea;
-	cin >> linea;
-
-	return linea;
-}
-
-
-
-char menuInicio() {
-	cout << "1. Jugar partida" << endl;
-	cout << "2. Ver estadisticas" << endl;
-	cout << "9. Para salir" << endl;
-	cout << "\n" << endl;
-	cout << "Opción: " << endl;
-
-	char linea[2];
-	cin >> linea;
-
-	return *linea;
-}
-
 bool empate(Ficha **tablero) {
 	for (int n = 0; n < COLUMNAS; n++) {
 		if (filaLibre(tablero, n) < FILAS) {
@@ -207,7 +176,7 @@ bool empate(Ficha **tablero) {
 	return true;
 }
 
-void jugarPartida(Ficha **tablero, bool contraIA, Jugador jugador, Jugador jugador2, sqlite3 *db) {
+void jugarPartida(Ficha **tablero, bool contraIA) {
 
 	limpiar(tablero);
 	bool juegaJug1 = true;
@@ -222,11 +191,6 @@ void jugarPartida(Ficha **tablero, bool contraIA, Jugador jugador, Jugador jugad
 		int columna;
 		if (!contraIA || juegaJug1) {
 			do {
-				if (columna < 1 || columna > COLUMNAS) {
-					cout
-							<< "\nEl numero de columna introducido no es valido. Vuelve a intentarlo."
-							<< endl;
-				}
 
 				visualizarTablero(tablero);
 
@@ -234,6 +198,11 @@ void jugarPartida(Ficha **tablero, bool contraIA, Jugador jugador, Jugador jugad
 				cout << "En que columna quieres poner tu ficha?\n" << endl;
 
 				cin >> columna;
+				if (columna < 1 || columna > COLUMNAS) {
+								cout
+										<< "\nEl numero de columna introducido no es valido. Vuelve a intentarlo."
+										<< endl;
+							}
 
 			} while (columna < 1 || columna > COLUMNAS);
 
@@ -241,6 +210,7 @@ void jugarPartida(Ficha **tablero, bool contraIA, Jugador jugador, Jugador jugad
 
 				juegaJug1 = !juegaJug1;
 			}
+
 		} else {
 			//JuegaIA
 			int colocado = eleccionIA(tablero);
@@ -255,12 +225,10 @@ void jugarPartida(Ficha **tablero, bool contraIA, Jugador jugador, Jugador jugad
 	if (comprobarVictoria(tablero, OBJETIVO) != 0) {
 
 		if (comprobarVictoria(tablero, OBJETIVO) == 1) {
-			sumarVictoria(db, jugador);
-			cout << "Has ganado " << jugador.getEMail()	<< ". Felicidades!\n" << endl;
+			cout << "Has ganado " << "jugador" << ". Felicidades!\n" << endl;
 
 		} else if (comprobarVictoria(tablero, OBJETIVO) == 2) {
-			sumarVictoria(db, jugador2);
-			cout << "Has ganado " << jugador2.getEMail()	<< ". Felicidades!\n" << endl;
+			cout << "Has ganado " << "IA" << ". Felicidades!\n" << endl;
 		}
 	} else {
 		cout << "Habeis empatado." << endl;
